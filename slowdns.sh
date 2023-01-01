@@ -7,13 +7,8 @@
 #setting IPtables
 iptables -I INPUT -p udp --dport 5300 -j ACCEPT
 iptables -t nat -I PREROUTING -p udp --dport 53 -j REDIRECT --to-ports 5300
-netfilter-persistent save
-netfilter-persistent reload
-
 cd
 #delete directory
-rm -rf /root/nsdomain
-rm nsdomain
 
 #input nameserver manual to cloudflare
 read -rp "Masukkan domain: " -e domain
@@ -55,19 +50,19 @@ service sshd restart
 #konfigurasi slowdns
 rm -rf /etc/slowdns
 mkdir -m 777 /etc/slowdns
-wget -q -O /etc/slowdns/server.key "https://raw.githubusercontent.com/fisabiliyusri/SLDNS/main/slowdns/server.key"
-wget -q -O /etc/slowdns/server.pub "https://raw.githubusercontent.com/fisabiliyusri/SLDNS/main/slowdns/server.pub"
-wget -q -O /etc/slowdns/sldns-server "https://raw.githubusercontent.com/fisabiliyusri/SLDNS/main/slowdns/sldns-server"
-wget -q -O /etc/slowdns/sldns-client "https://raw.githubusercontent.com/fisabiliyusri/SLDNS/main/slowdns/sldns-client"
+wget -q -O /etc/slowdns/server.key "https://raw.githubusercontent.com/tcatvpn/compileddns/main/server.key"
+wget -q -O /etc/slowdns/server.pub "https://raw.githubusercontent.com/tcatvpn/compileddns/main/server.pub"
+wget -q -O /etc/slowdns/dnstt-server "https://raw.githubusercontent.com/tcatvpn/compileddns/main/dnstt-server"
+wget -q -O /etc/slowdns/dnstt-client "https://raw.githubusercontent.com/tcatvpn/compileddns/main/dnstt-client"
 cd
 chmod +x /etc/slowdns/server.key
 chmod +x /etc/slowdns/server.pub
-chmod +x /etc/slowdns/sldns-server
-chmod +x /etc/slowdns/sldns-client
+chmod +x /etc/slowdns/dnstt-server
+chmod +x /etc/slowdns/dnstt-client
 
 cd
-#wget -q -O /etc/systemd/system/client-sldns.service "https://raw.githubusercontent.com/fisabiliyusri/SLDNS/main/slowdns/client-sldns.service"
-#wget -q -O /etc/systemd/system/server-sldns.service "https://raw.githubusercontent.com/fisabiliyusri/SLDNS/main/slowdns/server-sldns.service"
+#wget -q -O /etc/systemd/system/client-sldns.service "https://raw.githubusercontent.com/Romba89/SLDNS/main/client-sldns.service"
+#wget -q -O /etc/systemd/system/server-sldns.service "https://raw.githubusercontent.com/Romba89/SLDNS/main/server-sldns.service"
 
 cd
 #install client-sldns.service
@@ -83,7 +78,7 @@ User=root
 CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
 AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
 NoNewPrivileges=true
-ExecStart=/etc/slowdns/sldns-client -udp 8.8.8.8:53 --pubkey-file /etc/slowdns/server.pub $nameserver 127.0.0.1:2222
+ExecStart=/etc/slowdns/sldns-client -udp 1.1.1.1:53 --pubkey-file /etc/slowdns/server.pub $nameserver 127.0.0.1:2222
 Restart=on-failure
 
 [Install]
@@ -104,7 +99,7 @@ User=root
 CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
 AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
 NoNewPrivileges=true
-ExecStart=/etc/slowdns/sldns-server -udp :5300 -privkey-file /etc/slowdns/server.key $nameserver 127.0.0.1:2269
+ExecStart=/etc/slowdns/sldns-server -udp :5300 -privkey-file /etc/slowdns/server.key $nameserver 127.0.0.1:443
 Restart=on-failure
 
 [Install]
